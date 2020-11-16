@@ -8,6 +8,30 @@
 #include <QString>
 #include <QStyleFactory>
 
+void SetDarkPalette() {
+    qApp->setStyle(QStyleFactory::create("fusion"));
+
+    QPalette darkPalette;
+
+    // Настраиваем палитру для цветовых ролей элементов интерфейса
+    darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
+    darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+    darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
+    darkPalette.setColor(QPalette::ButtonText, Qt::white);
+    darkPalette.setColor(QPalette::BrightText, Qt::red);
+    darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
+    darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+
+    // Устанавливаем данную палитру
+    qApp->setPalette(darkPalette);
+}
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -17,7 +41,12 @@ Widget::Widget(QWidget *parent)
 //    ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Выполнить");
 //    ui->buttonBox->button(QDialogButtonBox::Cancel)->setText("Отмена");
 
+    // Установим стиль оформления dark
+    // Стандартная палитра является светлой
+    SetDarkPalette();
+
     ui->tabWidget->setCurrentWidget(ui->tab_DataXLS);//устанавливаем вкладку tab_DataXLS при запуске приложения
+    ui->dateReportEdit->setDate(QDate::currentDate());//устанавливаем текущую дату
 
     QString sHelloEng = "Hello!";
     ui->fileName409->setReadOnly(true);
@@ -77,10 +106,9 @@ void ExcelConnector(QString& file1, QString& file2, Ui::Widget& ui){
         QAxObject* cellRez = sheetRez->querySubObject("Cells(QVariant,QVariant)", 1, 1);
         // вставка значения переменной data (любой тип, приводимый к QVariant) в полученную ячейку
         cellRez->setProperty("Value", QVariant(result));
+
         // освобождение памяти
         delete cellRez;
-
-        // очистка памяти
         delete columns;
         delete rows;
         delete usedRange;
@@ -91,6 +119,7 @@ void ExcelConnector(QString& file1, QString& file2, Ui::Widget& ui){
         workbookRezult->dynamicCall("Save()");
         workbookRezult->dynamicCall("Close()");
         excel->dynamicCall("Quit()");//close Excel
+
         delete workbookData;
         delete workbookRezult;
         delete workbooks;
@@ -117,42 +146,13 @@ void SendAlarmMessage(QString& text, Ui::Widget& ui) {
 
 }
 
-void SetDarkPalette() {
-    qApp->setStyle(QStyleFactory::create("fusion"));
-
-    QPalette darkPalette;
-
-    // Настраиваем палитру для цветовых ролей элементов интерфейса
-    darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
-    darkPalette.setColor(QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
-    darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-    darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-    darkPalette.setColor(QPalette::Text, Qt::white);
-    darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
-    darkPalette.setColor(QPalette::ButtonText, Qt::white);
-    darkPalette.setColor(QPalette::BrightText, Qt::red);
-    darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-    darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
-    // Устанавливаем данную палитру
-    qApp->setPalette(darkPalette);
-}
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Установим стиль оформления dark
-    // Стандартная палитра является светлой
-    SetDarkPalette();
-
     Widget mainWindow;
     mainWindow.setWindowTitle("Расчет ПДК. v.1.0.");
-
-
 
     mainWindow.show();
     return a.exec();
