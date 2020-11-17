@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
+#include "excelconnect.h"
 
 #include <QApplication>
 #include <QAxObject>
@@ -64,78 +65,90 @@ Widget::~Widget()
     delete ui;
 }
 
-void ExcelConnector(QString& file1, QString& file2, Ui::Widget& ui){
+struct DocumentOSV {
+    QString sNumAccount;
+    QString sNumSubAccount;
+    QString sContragent;
+    QString sINN;
+    QString sName;
+    QString sIndicator;
+    double vDebit;
+    double vCredit;
+    double vDebitTurnover;
+};
 
-    ui.listWidgetMessages->addItem("Читаем файлы excel ...");
+class ExcelOperator {
+public:
+    void FileParser(QString& file, Ui::Widget& ui) {
 
-    try {
+        ui.listWidgetMessages->addItem("Читаем файл excel ...");
 
-        QAxObject* excel = new QAxObject( "Excel.Application", 0 );
-        QAxObject* workbooks = excel->querySubObject( "Workbooks" );
-        QAxObject* workbookData = workbooks->querySubObject( "Open(const QString&)", file1 );
-        QAxObject* workbookRezult = workbooks->querySubObject( "Open(const QString&)", file2 );
-        QAxObject* sheet = workbookData->querySubObject( "Worksheets(int)", 1 );//выбираем первый лист книги
-        QAxObject* sheetRez = workbookRezult->querySubObject( "Worksheets(int)", 1 );//выбираем первый лист книги
+        try {
 
-        //определяем число строк и столбцов
-        QAxObject* usedRange = sheet->querySubObject("UsedRange");
-        QAxObject* rows = usedRange->querySubObject("Rows");
-        QAxObject* columns = usedRange->querySubObject("Columns");
+            QAxObject* excel = new QAxObject( "Excel.Application", 0 );
+            QAxObject* workbooks = excel->querySubObject( "Workbooks" );
+            QAxObject* workbook = workbooks->querySubObject( "Open(const QString&)", file );
+            QAxObject* sheets = workbook->querySubObject("Worksheets");//получаем листы книги
+            //        QAxObject* workbookRezult = workbooks->querySubObject( "Open(const QString&)", file2 );
+            QAxObject* sheet = sheets->querySubObject( "Item(int)", 1 );//выбираем первый лист книги
+            //        QAxObject* sheetRez = workbookRezult->querySubObject( "Worksheets(int)", 1 );//выбираем первый лист книги
 
-        int countRows = rows->property("Count").toInt();
-        int countCols = columns->property("Count").toInt();
 
-        ui.listWidgetMessages->addItem("Чтение файлов прошло успешно.");
 
-        QString sNumRows = "Число строк в xls файле равно: ";
-        QString sNumCol = "Число столбцов в xls файле равно: ";
+            //определяем число строк и столбцов
+            QAxObject* usedRange = sheet->querySubObject("UsedRange");
+            QAxObject* rows = usedRange->querySubObject("Rows");
+            QAxObject* columns = usedRange->querySubObject("Columns");
 
-        ui.listWidgetMessages->addItem( sNumRows + QString::number(countRows) );
-        ui.listWidgetMessages->addItem( sNumCol + QString::number(countCols) );
+            int countRows = rows->property("Count").toInt();
+            int countCols = columns->property("Count").toInt();
 
-        // получение указателя на ячейку [row][col] ((!)нумерация с единицы)
-        int row = 5;
-        int col = 1;
-        QAxObject* cell = sheet->querySubObject("Cells(QVariant,QVariant)", row, col);
-        // получение содержимого
-        QVariant result = cell->property("Value");
-        // освобождение памяти
-        delete cell;
+            ui.listWidgetMessages->addItem("Чтение файла прошло успешно.");
 
-        // получение указателя на ячейку [row][col] ((!)нумерация с единицы)
-        QAxObject* cellRez = sheetRez->querySubObject("Cells(QVariant,QVariant)", 1, 1);
-        // вставка значения переменной data (любой тип, приводимый к QVariant) в полученную ячейку
-        cellRez->setProperty("Value", QVariant(result));
+            QString sNumRows = "Число строк в xls файле равно: ";
+            QString sNumCol = "Число столбцов в xls файле равно: ";
 
-        // освобождение памяти
-        delete cellRez;
-        delete columns;
-        delete rows;
-        delete usedRange;
-        delete sheet;
-        delete sheetRez;
+            ui.listWidgetMessages->addItem( sNumRows + QString::number(countRows) );
+            ui.listWidgetMessages->addItem( sNumCol + QString::number(countCols) );
 
-        workbookData->dynamicCall("Close()");//close file
-        workbookRezult->dynamicCall("Save()");
-        workbookRezult->dynamicCall("Close()");
-        excel->dynamicCall("Quit()");//close Excel
+            // получение указателя на ячейку [row][col] ((!)нумерация с единицы)
+            int row = 5;
+            int col = 1;
+            QAxObject* cell = sheet->querySubObject("Cells(QVariant,QVariant)", row, col);
+            // получение содержимого
+            QVariant result = cell->property("Value");
+            // освобождение памяти
+            delete cell;
 
-        delete workbookData;
-        delete workbookRezult;
-        delete workbooks;
-        delete excel;
+            // освобождение памяти
+            //        delete cellRez;
+            delete columns;
+            delete rows;
+            delete usedRange;
+            delete sheet;
+            delete sheets;
 
-        ui.listWidgetMessages->addItem("Обработка файлов excel завершена!");
+            workbook->dynamicCall("Close()");//close file
+            //        workbookRezult->dynamicCall("Save()");
+            //        workbookRezult->dynamicCall("Close()");
+            excel->dynamicCall("Quit()");//close Excel
 
-    }  catch (...) {
+            delete workbook;
+            //        delete workbookRezult;
+            delete workbooks;
+            delete excel;
 
-        ui.listWidgetMessages->addItem("Excel. Что-то пошло не так!");
+            ui.listWidgetMessages->addItem("Обработка файла excel завершена!");
 
+        }  catch (...) {
+
+            ui.listWidgetMessages->addItem("Excel. Что-то пошло не так!");
+
+        }
+
+        ui.listWidgetMessages->addItem("The End ...");
     }
-
-    ui.listWidgetMessages->addItem("The End ...");
-
-}
+};
 
 void SendAlarmMessage(QString& text, Ui::Widget& ui) {
     QListWidgetItem* pItem =new QListWidgetItem(text);
@@ -145,7 +158,6 @@ void SendAlarmMessage(QString& text, Ui::Widget& ui) {
 //        ui->listWidget->show();
 
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -180,8 +192,9 @@ void Widget::on_buttonBox_accepted()
     else {
         ui->listWidgetMessages->addItem("Ok!");
         QString fileData = ui->fileNameOSV->text();
-        QString fileRez = ui->fileNameResultReport->text();
-        ExcelConnector(fileData, fileRez, *ui);
+//        QString fileRez = ui->fileNameResultReport->text();
+        ExcelOperator excel;
+        excel.FileParser(fileData, *ui);
     }
 
 }

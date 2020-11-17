@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>762</width>
-    <height>599</height>
+    <width>761</width>
+    <height>616</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Widget</string>
@@ -16,8 +22,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>561</y>
+     <x>581</x>
+     <y>577</y>
      <width>170</width>
      <height>30</height>
     </rect>
@@ -37,7 +43,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>483</y>
+     <y>472</y>
      <width>741</width>
      <height>71</height>
     </rect>
@@ -505,7 +511,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_DataXLS">
     <attribute name="title">
@@ -696,7 +702,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayoutRequisites">
        <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="label_NmaeCompany">
+        <widget class="QLabel" name="label_NameCompany">
          <property name="text">
           <string>Наименование организации:</string>
          </property>
@@ -828,11 +834,11 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="label_MessageBox">
    <property name="geometry">
     <rect>
      <x>11</x>
-     <y>466</y>
+     <y>455</y>
      <width>151</width>
      <height>16</height>
     </rect>
@@ -858,9 +864,9 @@
   <widget class="QDateEdit" name="dateReportEdit">
    <property name="geometry">
     <rect>
-     <x>451</x>
-     <y>565</y>
-     <width>110</width>
+     <x>660</x>
+     <y>548</y>
+     <width>91</width>
      <height>22</height>
     </rect>
    </property>
@@ -877,8 +883,8 @@
   <widget class="QLabel" name="label_DateReport">
    <property name="geometry">
     <rect>
-     <x>377</x>
-     <y>567</y>
+     <x>586</x>
+     <y>550</y>
      <width>71</width>
      <height>16</height>
     </rect>
